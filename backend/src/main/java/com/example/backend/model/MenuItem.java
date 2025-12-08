@@ -31,7 +31,6 @@ public class MenuItem {
     @com.fasterxml.jackson.annotation.JsonIgnore
     private MenuCategory category;
 
-    // GETTERS & SETTERS
     public Long getId() {
         return id;
     }

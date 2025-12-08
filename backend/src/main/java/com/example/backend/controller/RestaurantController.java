@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.dto.RestaurantRequest;
@@ -49,6 +50,9 @@ public class RestaurantController {
         r.setRating(req.getRating());
         r.setOpeningHours(req.getOpeningHours());
         r.setOpen(req.isOpen());
+        r.setPhone(req.getPhone());
+        r.setDescription(req.getDescription());
+        r.setImageUrl(req.getImageUrl());
         r.setOwner(owner);
 
         return restaurantService.createRestaurant(r);
@@ -61,33 +65,20 @@ public class RestaurantController {
                 return ResponseEntity.status(401).body("Unauthorized");
             }
 
-            // Get user email from JWT
-            String email = authentication.getName();
-            User user = userService.getUserByEmail(email);
+            User user = (User) authentication.getPrincipal();
 
             if (user == null) {
                 return ResponseEntity.status(401).body("User not found");
             }
 
-            // Find restaurant by owner ID
             List<Restaurant> restaurants = restaurantRepo.findByOwnerId(user.getId());
 
             if (restaurants == null || restaurants.isEmpty()) {
                 return ResponseEntity.ok().body(null);
             }
 
-            // Return the first restaurant (owner can manage multiple but we'll show the
-            // first one)
             Restaurant r = restaurants.get(0);
-            java.util.Map<String, Object> response = new java.util.HashMap<>();
-            response.put("id", r.getId());
-            response.put("name", r.getName());
-            response.put("address", r.getAddress());
-            response.put("isOpen", r.isOpen());
-            response.put("status", r.getStatus());
-            response.put("ownerId", r.getOwner().getId());
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(r);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
@@ -95,8 +86,11 @@ public class RestaurantController {
     }
 
     @GetMapping("/restaurants")
-    public List<Restaurant> getAll() {
-        return restaurantService.getAllRestaurants();
+    public List<Restaurant> getAll(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String cuisine) {
+        return restaurantService.searchRestaurants(search, location, cuisine);
     }
 
     @GetMapping("/restaurants/{id}")
@@ -113,5 +107,11 @@ public class RestaurantController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         restaurantService.deleteRestaurant(id);
         return ResponseEntity.ok("Restaurant deleted");
+    }
+
+    @PutMapping("/restaurant/status/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam boolean open) {
+        restaurantService.updateStatus(id, open);
+        return ResponseEntity.ok(java.util.Collections.singletonMap("message", "Status updated"));
     }
 }

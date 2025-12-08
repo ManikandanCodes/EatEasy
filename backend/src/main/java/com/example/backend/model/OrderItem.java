@@ -25,18 +25,46 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Order order;
 
-    // GETTERS & SETTERS
-    public Long getId() { return id; }
-    public int getQuantity() { return quantity; }
-    public double getPrice() { return price; }
-    public MenuItem getMenuItem() { return menuItem; }
-    public Order getOrder() { return order; }
+    public Long getId() {
+        return id;
+    }
 
-    public void setId(Long id) { this.id = id; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
-    public void setPrice(double price) { this.price = price; }
-    public void setMenuItem(MenuItem menuItem) { this.menuItem = menuItem; }
-    public void setOrder(Order order) { this.order = order; }
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public MenuItem getMenuItem() {
+        return menuItem;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setMenuItem(MenuItem menuItem) {
+        this.menuItem = menuItem;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }

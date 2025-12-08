@@ -16,24 +16,24 @@ public class UserService {
         this.userRepo = userRepo;
     }
 
-    // Get user by ID
+
     public User getUserById(Long id) {
         return userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // Get user by email
+
     public User getUserByEmail(String email) {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // List all users (Admin feature)
+
     public List<User> getAllUsers() {
         return userRepo.findAll();
     }
 
-    // Update user basic profile
+   
     public User updateUser(Long id, User newData) {
         User user = getUserById(id);
 
@@ -43,7 +43,7 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    // Delete user (Admin)
+ 
     public void deleteUser(Long id) {
         if (!userRepo.existsById(id)) {
             throw new RuntimeException("User not found");
@@ -51,7 +51,7 @@ public class UserService {
         userRepo.deleteById(id);
     }
 
-    // List all customers
+
     public List<User> getAllCustomers() {
         return userRepo.findAll()
                 .stream()
@@ -59,7 +59,7 @@ public class UserService {
                 .toList();
     }
 
-    // List all restaurant owners
+
     public List<User> getAllRestaurantOwners() {
         return userRepo.findAll()
                 .stream()

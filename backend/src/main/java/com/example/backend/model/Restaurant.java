@@ -25,30 +25,35 @@ public class Restaurant {
 
     private String name;
     private String address;
-    private String cuisines; // e.g., "Chinese, Indian"
+    private String cuisines; 
     private double rating;
     private String openingHours;
     private boolean open;
 
+
+    private String phone;
+    private String description;
+    private String imageUrl;
+
     @Enumerated(EnumType.STRING)
-    private ApprovalStatus status = ApprovalStatus.PENDING; // Default to PENDING
+    private ApprovalStatus status = ApprovalStatus.PENDING; 
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    // A restaurant has menu categories
+
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<MenuCategory> categories;
 
-    // Approval Status Enum
+    
     public enum ApprovalStatus {
-        PENDING, // Waiting for admin approval
-        APPROVED, // Approved by admin, visible to customers
-        REJECTED // Rejected by admin
+        PENDING, 
+        APPROVED, 
+        REJECTED 
     }
 
-    // GETTERS & SETTERS
+
     public Long getId() {
         return id;
     }
@@ -127,5 +132,90 @@ public class Restaurant {
 
     public void setCategories(List<MenuCategory> categories) {
         this.categories = categories;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    
+    @jakarta.persistence.Transient
+    public boolean isAvailable() {
+        if (!open) {
+            return false; 
+        }
+        if (openingHours == null || openingHours.isEmpty()) {
+            return open; 
+        }
+
+        try {
+
+            String[] parts = openingHours.split("-");
+            if (parts.length != 2)
+                return open;
+
+            
+            java.time.ZoneId zone = java.time.ZoneId.of("Asia/Kolkata");
+            java.time.LocalTime now = java.time.LocalTime.now(zone);
+
+            java.time.LocalTime start = parseTime(parts[0].trim());
+            java.time.LocalTime end = parseTime(parts[1].trim());
+
+            if (start == null || end == null)
+                return open;
+
+            
+            if (end.isBefore(start)) {
+                return now.isAfter(start) || now.isBefore(end);
+            } else {
+                return now.isAfter(start) && now.isBefore(end);
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking availability: " + e.getMessage());
+            return open;
+        }
+    }
+
+    private java.time.LocalTime parseTime(String timeStr) {
+        try {
+            timeStr = timeStr.trim().toUpperCase();
+    
+            timeStr = timeStr.replaceAll("\\s+", " ");
+
+            java.time.format.DateTimeFormatter formatter;
+            if (timeStr.contains("AM") || timeStr.contains("PM")) {
+                
+                if (!timeStr.contains(":")) {
+                    timeStr = timeStr.replace(" AM", ":00 AM").replace(" PM", ":00 PM");
+                }
+                formatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a");
+            } else {
+                formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+            }
+            return java.time.LocalTime.parse(timeStr, formatter);
+        } catch (Exception e) {
+            System.err.println("Error parsing time: " + timeStr);
+            return null;
+        }
     }
 }

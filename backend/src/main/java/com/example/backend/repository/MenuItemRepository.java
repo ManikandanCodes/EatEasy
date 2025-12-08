@@ -16,4 +16,7 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     List<MenuItem> findByBestSeller(boolean bestSeller);
 
     List<MenuItem> findByOutOfStock(boolean outOfStock);
+
+    @org.springframework.data.jpa.repository.Query("SELECT m FROM MenuItem m WHERE m.category.restaurant.id = :restaurantId")
+    List<MenuItem> findByRestaurantId(Long restaurantId);
 }

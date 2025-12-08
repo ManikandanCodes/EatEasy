@@ -32,9 +32,8 @@ public class User {
     private Role role;
 
     @Column(name = "active")
-    private Boolean active = true; // Default true
+    private Boolean active = true;
 
-    // 🔥 NEW FIELD — To track restaurant registration status
     private boolean restaurantRegistered = false;
 
     public enum Role {
@@ -44,7 +43,6 @@ public class User {
         KITCHEN_STAFF
     }
 
-    // GETTERS
     public Long getId() {
         return id;
     }
@@ -77,7 +75,6 @@ public class User {
         return restaurantRegistered;
     }
 
-    // SETTERS
     public void setId(Long id) {
         this.id = id;
     }

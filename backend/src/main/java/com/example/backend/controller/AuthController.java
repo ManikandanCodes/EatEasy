@@ -20,9 +20,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // ============================
-    //      REGISTER USER
-    // ============================
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
 
@@ -33,23 +31,38 @@ public class AuthController {
         user.setPassword(req.getPassword());
         user.setRole(User.Role.valueOf(req.getRole()));
 
-        // 🔥 IMPORTANT: Restaurant owners must register restaurant after signup
-        if (req.getRole().equalsIgnoreCase("RESTAURANT_OWNER")) {
+        
+        if (req.getRole().equalsIgnoreCase("ROLE_RESTAURANT_OWNER")
+                || req.getRole().equalsIgnoreCase("RESTAURANT_OWNER")) {
             user.setRestaurantRegistered(false);
         }
 
         return ResponseEntity.ok(authService.register(user));
     }
 
-    // ============================
-    //         LOGIN USER
-    // ============================
+    
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+        try {
+            LoginResponse response = authService.login(req.getEmail(), req.getPassword());
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
 
-        LoginResponse response =
-                authService.login(req.getEmail(), req.getPassword());
 
-        return ResponseEntity.ok(response);
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Not authenticated");
+        }
+
+    
+        String email = authentication.getName();
+
+
+
+        return ResponseEntity.ok(authService.getUserByEmail(email));
     }
 }

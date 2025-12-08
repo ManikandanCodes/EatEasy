@@ -8,7 +8,6 @@ public class LoginResponse {
     private String role;
     private UserInfo user;
 
-    // NEW FIELD
     private boolean isRestaurantRegistered;
 
     public LoginResponse() {
@@ -53,7 +52,6 @@ public class LoginResponse {
         isRestaurantRegistered = restaurantRegistered;
     }
 
-    // Inner class for user info
     public static class UserInfo {
         private Long id;
         private String name;

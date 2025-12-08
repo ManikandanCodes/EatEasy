@@ -2,7 +2,10 @@ package com.example.backend.config;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -19,6 +22,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     private final JwtUtil jwtUtil;
     private final UserRepository userRepo;
 
@@ -28,34 +33,46 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req,
-            HttpServletResponse res,
-            FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = req.getHeader("Authorization");
 
-        String token = null;
-        String email = null;
-
-        // Get token: "Bearer <token>"
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            email = jwtUtil.getEmailFromToken(token);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(req, res);
+            return;
         }
 
-        // Validate token and authenticate user
+        String token = authHeader.substring(7);
+
+        String email;
+        try {
+            email = jwtUtil.getEmailFromToken(token);
+        } catch (Exception e) {
+            filterChain.doFilter(req, res);
+            return;
+        }
+
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             User user = userRepo.findByEmail(email).orElse(null);
 
             if (user != null && jwtUtil.validateToken(token)) {
 
+                
+                String tokenRole = jwtUtil.getRoleFromToken(token);
+
+                
+                String finalRole = tokenRole.startsWith("ROLE_") ? tokenRole : "ROLE_" + tokenRole;
+
+                logger.info("AUTH DEBUG: Email={}, Role={}, Authority={}", email, tokenRole, finalRole);
+
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(finalRole);
+
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         user,
                         null,
-                        null // no roles for now
-                );
+                        java.util.List.of(authority));
 
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -65,10 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(req, res);
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        // Skip JWT filter for auth endpoints
-        return path.startsWith("/api/auth/");
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getRequestURI().startsWith("/api/auth/");
     }
 }

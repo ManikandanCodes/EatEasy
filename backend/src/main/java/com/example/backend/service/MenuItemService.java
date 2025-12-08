@@ -35,6 +35,14 @@ public class MenuItemService {
         return itemRepo.findByCategory(category);
     }
 
+    public List<MenuItem> getAllItems() {
+        return itemRepo.findAll();
+    }
+
+    public List<MenuItem> getItemsByRestaurant(Long restaurantId) {
+        return itemRepo.findByRestaurantId(restaurantId);
+    }
+
     public MenuItem updateItem(Long itemId, MenuItem newData) {
         MenuItem item = itemRepo.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));

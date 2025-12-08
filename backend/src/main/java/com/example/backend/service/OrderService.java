@@ -20,7 +20,7 @@ public class OrderService {
     private final RestaurantRepository restaurantRepo;
 
     public OrderService(OrderRepository orderRepo, UserRepository userRepo,
-                        RestaurantRepository restaurantRepo) {
+            RestaurantRepository restaurantRepo) {
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
         this.restaurantRepo = restaurantRepo;
@@ -37,7 +37,7 @@ public class OrderService {
         order.setCustomer(customer);
         order.setRestaurant(restaurant);
         order.setOrderTime(new Date());
-        order.setStatus("RECEIVED");
+        order.setStatus("PLACED");
 
         return orderRepo.save(order);
     }
@@ -62,5 +62,14 @@ public class OrderService {
 
         order.setStatus(status);
         return orderRepo.save(order);
+    }
+
+    public Order getOrderById(Long orderId) {
+        return orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+    }
+
+    public void deleteAllOrders() {
+        orderRepo.deleteAll();
     }
 }

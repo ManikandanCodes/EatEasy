@@ -20,7 +20,7 @@ public class MenuCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // Starters, Meals, Desserts, etc.
+    private String name;
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
@@ -30,7 +30,6 @@ public class MenuCategory {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<MenuItem> items;
 
-    // GETTERS & SETTERS
     public Long getId() {
         return id;
     }

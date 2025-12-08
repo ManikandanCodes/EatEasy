@@ -2,6 +2,7 @@ package com.example.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,31 +25,58 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        
         JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtUtil, userRepo);
 
         http
-                .cors(cors -> cors.configurationSource(request -> {
-                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfiguration.setAllowedOriginPatterns(java.util.List.of("*"));
-                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
-                    corsConfiguration.setAllowCredentials(true);
-                    corsConfiguration.setMaxAge(3600L);
-                    return corsConfiguration;
-                }))
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(basic -> basic.disable())
+                .formLogin(form -> form.disable())
+
+                
+                .cors(cors -> cors.configurationSource(request -> {
+                    var c = new org.springframework.web.cors.CorsConfiguration();
+                    c.setAllowedOriginPatterns(java.util.List.of("*"));
+                    c.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    c.setAllowedHeaders(java.util.List.of("*"));
+                    c.setAllowCredentials(true);
+                    return c;
+                }))
+
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers("/api/auth/**").permitAll()
+
                         .requestMatchers("/api/restaurants/**").permitAll()
-                        .requestMatchers("/api/restaurant/**").permitAll() // Restaurant owner operations
+                        .requestMatchers("/api/restaurant/**").permitAll()
                         .requestMatchers("/api/menu/**").permitAll()
-                        .requestMatchers("/api/admin/**").permitAll() // Admin operations
+                        .requestMatchers("/api/categories/**").permitAll()
+                        .requestMatchers("/api/menu-items/**").permitAll()
+                        .requestMatchers("/api/orders/coupons").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+
+                        .requestMatchers("/api/orders/restaurant/**")
+                        .hasAuthority("ROLE_RESTAURANT_OWNER")
+
+                        .requestMatchers("/api/analytics/restaurant/**")
+                        .hasAuthority("ROLE_RESTAURANT_OWNER")
+
+                        .requestMatchers("/api/orders/customer/**").permitAll()
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/orders/all").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+
+
                         .anyRequest().authenticated())
+
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-
     }
 
     @Bean

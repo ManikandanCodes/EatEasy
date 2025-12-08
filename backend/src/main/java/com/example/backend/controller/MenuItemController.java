@@ -43,9 +43,19 @@ public class MenuItemController {
         return itemService.addItem(req.getCategoryId(), item);
     }
 
+    @GetMapping
+    public List<MenuItem> getAllItems() {
+        return itemService.getAllItems();
+    }
+
     @GetMapping("/category/{categoryId}")
     public List<MenuItem> getByCategory(@PathVariable Long categoryId) {
         return itemService.getItemsByCategory(categoryId);
+    }
+
+    @GetMapping("/restaurant/{restaurantId}")
+    public List<MenuItem> getByRestaurant(@PathVariable Long restaurantId) {
+        return itemService.getItemsByRestaurant(restaurantId);
     }
 
     @PutMapping("/{id}")

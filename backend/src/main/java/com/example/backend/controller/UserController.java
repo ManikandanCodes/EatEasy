@@ -27,28 +27,23 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Get by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         User u = userService.getUserById(id);
         return ResponseEntity.ok(new UserResponse(
-                u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().toString()
-        ));
+                u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().toString()));
     }
 
-    // Get all
     @GetMapping
     public List<User> getAll() {
         return userService.getAllUsers();
     }
 
-    // Update user profile
     @PutMapping("/{id}")
     public User update(@PathVariable Long id, @RequestBody User newData) {
         return userService.updateUser(id, newData);
     }
 
-    // Delete user
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         userService.deleteUser(id);

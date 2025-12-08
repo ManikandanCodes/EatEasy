@@ -12,31 +12,75 @@ public class MenuItemRequest {
     private boolean bestSeller;
     private boolean outOfStock;
 
-    // getters & setters…
-    public Long getCategoryId() { return categoryId; }
-    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+    public Long getCategoryId() {
+        return categoryId;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
-    public String getIngredients() { return ingredients; }
-    public void setIngredients(String ingredients) { this.ingredients = ingredients; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public String getDescription() {
+        return description;
+    }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public boolean isVeg() { return veg; }
-    public void setVeg(boolean veg) { this.veg = veg; }
+    public String getIngredients() {
+        return ingredients;
+    }
 
-    public boolean isBestSeller() { return bestSeller; }
-    public void setBestSeller(boolean bestSeller) { this.bestSeller = bestSeller; }
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
 
-    public boolean isOutOfStock() { return outOfStock; }
-    public void setOutOfStock(boolean outOfStock) { this.outOfStock = outOfStock; }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public boolean isVeg() {
+        return veg;
+    }
+
+    public void setVeg(boolean veg) {
+        this.veg = veg;
+    }
+
+    public boolean isBestSeller() {
+        return bestSeller;
+    }
+
+    public void setBestSeller(boolean bestSeller) {
+        this.bestSeller = bestSeller;
+    }
+
+    public boolean isOutOfStock() {
+        return outOfStock;
+    }
+
+    public void setOutOfStock(boolean outOfStock) {
+        this.outOfStock = outOfStock;
+    }
 }
