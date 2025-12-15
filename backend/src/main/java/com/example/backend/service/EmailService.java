@@ -18,7 +18,7 @@ public class EmailService {
                 message.setTo(to);
                 message.setSubject(subject);
                 message.setText(body);
-                message.setFrom("eateasy.demo@gmail.com"); // Placeholder, user needs to config
+                message.setFrom("eateasy.demo@gmail.com"); 
                 mailSender.send(message);
                 System.out.println("Email sent to " + to);
             } catch (Exception e) {
